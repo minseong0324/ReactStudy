@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './reducers';
-
+import axios from 'axios';
+import { openStdin } from 'process';
+import { fetchPosts } from './actions/posts';
 
 type Props = {
   value: number;
   onIncrement: () => void;
   onDecrement: () => void;
+}
+
+interface Post {
+  userId: number;
+    id: number;
+    title: string;
 }
 
 function App({ value, onIncrement, onDecrement }: Props) {
@@ -17,7 +25,17 @@ function App({ value, onIncrement, onDecrement }: Props) {
   const dispatch = useDispatch() //useDispatch()를 react-redux에서 가져온다.
   const todos: string[] = useSelector((state: RootState) => state.todos)
   const counter = useSelector((state: RootState) => state.counter);
+  const posts: Post[] = useSelector((state: RootState) => state.posts)
   const [todoValue, setTodoValue] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchPosts())
+  }, [dispatch])
+
+
+
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTodoValue(e.target.value);
   }
@@ -48,6 +66,10 @@ function App({ value, onIncrement, onDecrement }: Props) {
         <input type="text" value={todoValue} onChange={handleChange} />
         <input type="submit" />
       </form>
+
+      <ul>
+        {posts.map((post, index) => <li key={index}>{post.title}</li>)}
+      </ul>
 
     </div>
   );
